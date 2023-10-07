@@ -1,5 +1,8 @@
-import { Http2Mqtt } from './http-to-mqtt.js'
+import { BaseEntity, VikaOptions, MappingOptions, wait } from './vika.js'
 
 export {
-  Http2Mqtt,
+  BaseEntity,
+  type VikaOptions,
+  type MappingOptions,
+  wait,
 }

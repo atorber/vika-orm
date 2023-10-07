@@ -1,6 +1,7 @@
 {
   "extends": "@chatie/tsconfig",
   "compilerOptions": {
+    "target": "es2017",
     "outDir": "dist/esm",
     "ignoreDeprecations": "5.0",
   },

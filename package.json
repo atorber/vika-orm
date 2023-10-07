@@ -1,7 +1,7 @@
 {
-  "name": "http2mqtt",
-  "version": "0.3.8",
-  "description": "Using HTTP requests to publish mqtt messages",
+  "name": "vika-orm",
+  "version": "0.1.0",
+  "description": "a vika orm",
   "type": "module",
   "exports": {
     ".": {
@@ -15,30 +15,17 @@
     "npm": ">=7"
   },
   "dependencies": {
-    "@types/jsonata": "^1.5.1",
-    "crypto": "^1.0.1",
-    "jsonata": "^2.0.3",
-    "mqtt": "^3.0.0"
+    "@vikadata/vika": "^1.0.5"
   },
   "devDependencies": {
     "@chatie/eslint-config": "^1.0.4",
     "@chatie/git-scripts": "^0.6.2",
     "@chatie/semver": "^0.4.7",
     "@chatie/tsconfig": "^4.6.2",
-    "@types/koa": "^2.13.8",
-    "@types/koa-bodyparser": "^4.3.10",
-    "@types/koa-router": "^7.4.4",
-    "@types/mqtt": "^2.5.0",
-    "@types/mustache": "^4.1.2",
     "@types/node": "^20.6.5",
+    "@types/uuid": "^9.0.5",
     "eslint": "^8.48.0",
-    "express": "^4.18.2",
-    "http2mqtt": "^0.3.6",
-    "koa": "^2.14.2",
-    "koa-bodyparser": "^4.4.1",
-    "koa-router": "^12.0.0",
-    "language-monitor": "^1.0.3",
-    "mustache": "^4.2.0"
+    "uuid": "^9.0.1"
   },
   "scripts": {
     "build": "tsc && tsc -p tsconfig.cjs.json",
@@ -60,18 +47,18 @@
   },
   "repository": {
     "type": "git",
-    "url": "git+https://github.com/atorber/http2mqtt.git"
+    "url": "git+https://github.com/atorber/vika-orm.git"
   },
   "keywords": [
     "mqtt",
-    "http2mqtt"
+    "vika-orm"
   ],
   "author": "atorber <atorber@163.com> (超哥)",
   "license": "Apache-2.0",
   "bugs": {
-    "url": "https://github.com/atorber/http2mqtt/issues"
+    "url": "https://github.com/atorber/vika-orm/issues"
   },
-  "homepage": "https://github.com/atorber/http2mqtt#readme",
+  "homepage": "https://github.com/atorber/vika-orm#readme",
   "files": [
     "bin/",
     "dist/",
