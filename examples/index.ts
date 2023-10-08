@@ -89,4 +89,8 @@ async function main () {
   await wait(500)  // 等待 500 毫秒
 }
 
-await main()
+(async function () {
+  await main()
+})().catch(error => {
+  console.error(error)
+})
