@@ -1,27 +1,3 @@
-# vika-orm
-
-## 简介
-
-维格表vika的ts ORM
-
-## 快速开始
-
-```shell
-npm i
-npm run start
-```
-
-## 使用
-
-1. 安装依赖
-
-```shell
-npm i vika-orm
-```
-
-1. 示例代码
-
-```ts
 import { log } from 'console'
 import { BaseEntity, VikaOptions, MappingOptions, wait } from 'vika-orm' // 导入 BaseEntity, VikaOptions, 和 MappingOptions 类型/类
 import { v4 as uuidv4 } from 'uuid'
@@ -117,11 +93,3 @@ async function main () {
 })().catch(error => {
   console.error(error)
 })
-
-```
-
-## 历史版本
-
-### v0.1.1 (2023-10-7)
-
-1. 初始化创建代码库及npm包

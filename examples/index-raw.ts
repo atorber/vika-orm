@@ -1,12 +1,11 @@
 import { log } from 'console'
 import { BaseEntity, VikaOptions, MappingOptions, wait } from '../src/mod.js' // 导入 BaseEntity, VikaOptions, 和 MappingOptions 类型/类
-import 'dotenv/config.js'  // 导入环境变量配置
 import { v4 as uuidv4 } from 'uuid'
 
 async function main () {
   const vikaOptions: VikaOptions = {  // 定义 Vika API 的选项
-    apiKey: '',  // 从环境变量获取 API 密钥
-    baseId: 'dstv5YCjy3PUtN882p',  // 设置 base ID
+    apiKey: '替换为你自己的vika token',  // vika API 密钥
+    baseId: '替换为你自己的表id',  // 设置 base ID
   }
 
   const mappingOptions: MappingOptions = {  // 定义字段映射选项
