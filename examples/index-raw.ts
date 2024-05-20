@@ -1,6 +1,5 @@
 import { log } from 'console'
-import { BaseEntity, VikaOptions, MappingOptions, wait } from '../src/mod.js' // 导入 BaseEntity, VikaOptions, 和 MappingOptions 类型/类
-import { v4 as uuidv4 } from 'uuid'
+import { BaseEntity, VikaOptions, MappingOptions, wait, uuidv4 } from '../src/mod.js' // 导入 BaseEntity, VikaOptions, 和 MappingOptions 类型/类
 
 async function main () {
   const vikaOptions: VikaOptions = {  // 定义 Vika API 的选项

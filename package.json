@@ -1,6 +1,6 @@
 {
   "name": "vika-orm",
-  "version": "0.2.0",
+  "version": "0.2.1",
   "description": "a vika orm",
   "type": "module",
   "exports": {
@@ -28,8 +28,8 @@
     "@types/node": "^20.6.5",
     "@types/uuid": "^9.0.5",
     "eslint": "^8.48.0",
-    "vika-orm": "^0.1.4",
-    "uuid": "^9.0.1"
+    "uuid": "^9.0.1",
+    "vika-orm": "^0.1.4"
   },
   "scripts": {
     "build": "tsc && tsc -p tsconfig.cjs.json",
