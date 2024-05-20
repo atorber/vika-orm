@@ -1,6 +1,6 @@
 {
   "name": "vika-orm",
-  "version": "0.2.2",
+  "version": "0.2.3",
   "description": "a vika orm",
   "type": "module",
   "exports": {
@@ -15,7 +15,8 @@
     "npm": ">=7"
   },
   "dependencies": {
-    "@vikadata/vika": "^1.0.5"
+    "@vikadata/vika": "^1.0.5",
+    "uuid": "^9.0.1"
   },
   "peerDependencies": {
     "@swc/core": "^1.3.78"
@@ -28,7 +29,6 @@
     "@types/node": "^20.6.5",
     "@types/uuid": "^9.0.5",
     "eslint": "^8.48.0",
-    "uuid": "^9.0.1",
     "vika-orm": "^0.1.4"
   },
   "scripts": {
