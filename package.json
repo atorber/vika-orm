@@ -1,7 +1,7 @@
 {
   "name": "vika-orm",
-  "version": "0.2.3",
-  "description": "a vika orm",
+  "version": "0.4.1",
+  "description": "a sheetdb sdk for vika/lark",
   "type": "module",
   "exports": {
     ".": {
@@ -15,7 +15,9 @@
     "npm": ">=7"
   },
   "dependencies": {
+    "@larksuiteoapi/node-sdk": "^1.38.0",
     "@vikadata/vika": "^1.0.5",
+    "axios": "^1.7.7",
     "uuid": "^9.0.1"
   },
   "peerDependencies": {
