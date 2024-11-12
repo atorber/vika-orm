@@ -51,7 +51,8 @@
     "test-test": "npm-run-all lint test:unit",
     "test:pack": "bash -x scripts/npm-pack-testing.sh",
     "test:unit": "cross-env NODE_OPTIONS=\"--no-warnings --loader=ts-node/esm\" tap \"src/**/*.spec.ts\" \"tests/**/*.spec.ts\"",
-    "lint:es": "eslint --ignore-pattern tests/fixtures/ '{bin,examples,scripts,src,tests}/**/*.ts'"
+    "lint:es": "eslint --ignore-pattern tests/fixtures/ '{bin,examples,scripts,src,tests}/**/*.ts'",
+    "start-sheetdb": "cross-env NODE_OPTIONS=\"--no-warnings --loader=ts-node/esm\" node examples/sheetdb-demo.ts"
   },
   "repository": {
     "type": "git",
@@ -77,10 +78,5 @@
   },
   "publishConfig": {
     "tag": "latest"
-  },
-  "git": {
-    "scripts": {
-      "pre-push": "npx git-scripts-pre-push"
-    }
   }
 }
