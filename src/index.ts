@@ -1,4 +1,3 @@
-// Bug 修复：添加 @larksuiteoapi/node-sdk 依赖
 import * as lark from '@larksuiteoapi/node-sdk'
 import axios from 'axios'
 
