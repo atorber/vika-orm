@@ -49,9 +49,10 @@ abstract class BaseClient<Ops extends BaseOps> {
   abstract init(): Promise<Table>;
   abstract create(name: string, heading: Document): Promise<Table>;
   abstract list(name: string): Promise<Table>;
-  abstract insert(doc: Document): Promise<Document>;
+  abstract insert(doc: Document | Document[]): Promise<Document | Document[]>;
   abstract update(query: Document, doc: Document): Promise<Document>;
-  abstract find(query: Document): Promise<Document>;
+  abstract find(query: Document): Promise<Document[]>;
+  abstract findOne(query: Document): Promise<Document>;
   abstract remove(query: Document): Promise<Document>;
 
 }
@@ -166,15 +167,22 @@ export class LarkSheet extends BaseClient<SheetOps> {
   }
 
   // 写入数据
-  async insert (doc: Document): Promise<Document> {
-    const preparedDoc = this.prepareDocument(doc)
-    const dataArr = Object.values(preparedDoc)
+  async insert (doc: Document | Document[]): Promise<Document | Document[]> {
+    const docs = Array.isArray(doc) ? doc : [ doc ]
+    const values: (string | number | boolean)[][] = []
+    const newDocs: Document[] = []
+    docs.forEach((doc) => {
+      const preparedDoc = this.prepareDocument(doc)
+      newDocs.push(preparedDoc)
+      const dataArr = Object.values(preparedDoc)
+      values.push(dataArr)
+    })
     const res = await axios.post(
       `https://open.feishu.cn/open-apis/sheets/v2/spreadsheets/${this.ops.spreadsheetToken}/values_append?insertDataOption=OVERWRITE`,
       {
         valueRange: {
           range: `${this.tableId}`,
-          values: [ dataArr ],
+          values,
         },
       },
       {
@@ -186,7 +194,7 @@ export class LarkSheet extends BaseClient<SheetOps> {
     )
 
     if (res.data.code === 0 && res.data.msg === 'success') {
-      return preparedDoc
+      return newDocs.length > 1 ? newDocs : (newDocs[0] || [])
     } else {
       return res.data
     }
@@ -221,19 +229,13 @@ export class LarkSheet extends BaseClient<SheetOps> {
   }
 
   // 查找数据
-  async find (query: Document): Promise<Document> {
-    console.info('query', query)
-    const res = await axios.get(
-      `https://open.feishu.cn/open-apis/sheets/v2/spreadsheets/${this.ops.spreadsheetToken}/values_get`,
-      {
-        headers: {
-          Authorization: `Bearer ${await this.getTenantAccessToken()}`,
-          'Content-Type': 'application/json',
-        },
-      },
-    )
-    console.info(JSON.stringify(res.data, null, 2))
-    return res.data
+  async find (query: Document): Promise<Document[]> {
+    return [ query ]
+  }
+
+  // 查找数据
+  async findOne (query: Document): Promise<Document> {
+    return query
   }
 
   // 删除数据
@@ -345,23 +347,52 @@ export class LarkTable extends BaseClient<TableOps> {
   }
 
   // 写入数据
-  async insert (doc: { [key: string]: any }): Promise<Document> {
-    const preparedDoc = this.prepareDocument(doc)
-    const res = await this.client.bitable.appTableRecord.create({
-      data: {
-        fields: preparedDoc,
-      },
-      path: {
-        app_token: this.ops.appToken,
-        table_id: this.tableId,
-      },
+  async insert (doc: { [key: string]: any }): Promise<Document | Document[]> {
+    const docs = Array.isArray(doc) ? doc : [ doc ]
+    const newDocs: Document[] = []
+    docs.forEach((doc) => {
+      const preparedDoc = this.prepareDocument(doc)
+      newDocs.push(preparedDoc)
     })
 
-    if (res.msg === 'success' && res.code === 0) {
-      return preparedDoc
+    if (newDocs.length > 1) {
+      const fields = newDocs.map((doc) => {
+        return {
+          fields: doc,
+        }
+      })
+      const res = await this.client.bitable.appTableRecord.batchCreate({
+        data: {
+          records: fields,
+        },
+        path: {
+          app_token: this.ops.appToken,
+          table_id: this.tableId,
+        },
+      })
+      if (res.msg === 'success' && res.code === 0) {
+        return newDocs
+      } else {
+        return {
+          error: JSON.stringify(res),
+        }
+      }
     } else {
-      return {
-        error: JSON.stringify(res),
+      const res = await this.client.bitable.appTableRecord.create({
+        data: {
+          fields: newDocs[0] || {},
+        },
+        path: {
+          app_token: this.ops.appToken,
+          table_id: this.tableId,
+        },
+      })
+      if (res.msg === 'success' && res.code === 0) {
+        return newDocs[0] || {}
+      } else {
+        return {
+          error: JSON.stringify(res),
+        }
       }
     }
   }
@@ -373,10 +404,16 @@ export class LarkTable extends BaseClient<TableOps> {
   }
 
   // 查找数据
-  async find (query: Document): Promise<Document> {
+  async findOne (query: Document): Promise<Document> {
+    console.info('query', query)
+    return query
+  }
+
+  // 查找数据
+  async find (query: Document): Promise<Document[]> {
     console.info('query', query)
 
-    return query
+    return [ query ]
   }
 
   // 删除数据
@@ -448,17 +485,22 @@ export class VikaTable extends BaseClient<VikaOps> {
   }
 
   // 写入维格表
-  async insert (doc: Document): Promise<Document> {
-    const preparedDoc = this.prepareDocument(doc)
-    // console.info('preparedDoc', preparedDoc);
+  async insert (doc: Document): Promise<Document | Document[]> {
+    const docs = Array.isArray(doc) ? doc : [ doc ]
+    const newDocs: Document[] = []
+    docs.forEach((doc) => {
+      const preparedDoc = this.prepareDocument(doc)
+      newDocs.push(preparedDoc)
+    })
+    const fields = newDocs.map((doc) => {
+      return {
+        fields: doc,
+      }
+    })
     const res = await axios.post(
       `${this.vikaBaseURL}/datasheets/${this.tableId}/records`,
       {
-        records: [
-          {
-            fields: preparedDoc,
-          },
-        ],
+        records: fields,
       },
       {
         headers: {
@@ -470,7 +512,7 @@ export class VikaTable extends BaseClient<VikaOps> {
 
     // console.info(JSON.stringify(res.data, null, 2));
     if (res.data.code === 200 && res.data.success) {
-      return preparedDoc
+      return newDocs.length > 1 ? newDocs : (newDocs[0] || [])
     } else {
       return res.data
     }
@@ -516,9 +558,15 @@ export class VikaTable extends BaseClient<VikaOps> {
   }
 
   // 查找数据
-  async find (query: Document): Promise<Document> {
+  async findOne (query: Document): Promise<Document> {
     console.info('query', query)
     return query
+  }
+
+  // 查找数据
+  async find (query: Document): Promise<Document[]> {
+    console.info('query', query)
+    return [ query ]
   }
 
   // 删除数据
