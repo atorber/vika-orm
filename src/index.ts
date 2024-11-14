@@ -2,10 +2,14 @@
 import * as lark from '@larksuiteoapi/node-sdk'
 import axios from 'axios'
 
+interface Document { [key: string]: string | number | boolean }
+
 // 抽象基类定义共有的操作
 interface BaseOps {
   appId: string;
   appSecret: string;
+  autoload?: boolean;
+  heading?: Document;
 }
 
 interface Table {
@@ -13,13 +17,14 @@ interface Table {
   title: string
 }
 
-interface Document { [key: string]: string | number | boolean }
-
 abstract class BaseClient<Ops extends BaseOps> {
 
   ops: Ops
   client: lark.Client
   tableId: string = ''
+  defaultHeading = {
+    _id: '123456',
+  }
 
   constructor (ops: Ops) {
     this.ops = ops
@@ -149,11 +154,10 @@ export class LarkSheet extends BaseClient<SheetOps> {
         title: sheetFilter[0].title,
       }
     } else {
-      // const res2 = await this.create(title);
-      // return {
-      //     sheetId: res2.data.replies[0].addSheet.properties.sheetId,
-      //     title: title
-      // };
+      if (this.ops.autoload) {
+        const res2 = await this.create(title, this.ops.heading || this.defaultHeading)
+        return res2
+      }
       return {
         sheetId: '',
         title,
@@ -329,15 +333,10 @@ export class LarkTable extends BaseClient<TableOps> {
         title,
       }
     } else {
-      // const type: 1 | 2 = 1;
-      // const fields = [
-      //     {
-      //         "field_name": "名称",
-      //         "type": type
-      //     },
-      // ];
-      // const res2 = await this.create(title, fields);
-      // return res2;
+      if (this.ops.autoload) {
+        const res2 = await this.create(title, this.ops.heading || this.defaultHeading)
+        return res2
+      }
       return {
         sheetId: '',
         title,
@@ -498,6 +497,10 @@ export class VikaTable extends BaseClient<VikaOps> {
         title: tableFilter[0].name,
       }
     } else {
+      if (this.ops.autoload) {
+        const res2 = await this.create(title, this.ops.heading || this.defaultHeading)
+        return res2
+      }
       return {
         sheetId: '',
         title,

@@ -1,6 +1,6 @@
 {
   "name": "vika-orm",
-  "version": "0.6.0",
+  "version": "0.6.2",
   "description": "a sheetdb sdk for vika/lark",
   "type": "module",
   "exports": {
