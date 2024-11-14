@@ -53,7 +53,9 @@
     "test:pack": "bash -x scripts/npm-pack-testing.sh",
     "test:unit": "cross-env NODE_OPTIONS=\"--no-warnings --loader=ts-node/esm\" tap \"src/**/*.spec.ts\" \"tests/**/*.spec.ts\"",
     "lint:es": "eslint --ignore-pattern tests/fixtures/ '{bin,examples,scripts,src,tests}/**/*.ts'",
-    "start-sheetdb": "cross-env NODE_OPTIONS=\"--no-warnings --loader=ts-node/esm\" node examples/sheetdb-demo.ts"
+    "start-sheetdb": "cross-env NODE_OPTIONS=\"--no-warnings --loader=ts-node/esm\" node examples/sheetdb-demo.ts",
+    "test-sheetdb": "cross-env NODE_OPTIONS=\"--no-warnings --loader=ts-node/esm\" node test/test.ts"
+
   },
   "repository": {
     "type": "git",

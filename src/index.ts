@@ -60,6 +60,7 @@ export interface SheetOps extends BaseOps {
 export class LarkSheet extends BaseClient<SheetOps> {
 
   tenant_access_token: string = ''
+  tenant_access_token_time: number = 0
 
   constructor (ops: SheetOps) {
     super(ops)
@@ -74,9 +75,18 @@ export class LarkSheet extends BaseClient<SheetOps> {
       },
     })
     this.tenant_access_token = res.tenant_access_token
+    this.tenant_access_token_time = new Date().getTime()
     const table = await this.list(this.ops.name)
     this.tableId = table.sheetId
     return table
+  }
+
+  async getTenantAccessToken () {
+    const now = new Date().getTime()
+    if (now - this.tenant_access_token_time > (2 * 60 * 60 * 1000 - 10 * 60 * 1000)) {
+      await this.init()
+    }
+    return this.tenant_access_token
   }
 
   // 创建表格
@@ -98,7 +108,7 @@ export class LarkSheet extends BaseClient<SheetOps> {
       },
       {
         headers: {
-          Authorization: `Bearer ${this.tenant_access_token}`,
+          Authorization: `Bearer ${await this.getTenantAccessToken()}`,
           'Content-Type': 'application/json',
         },
       },
@@ -124,7 +134,7 @@ export class LarkSheet extends BaseClient<SheetOps> {
       `https://open.feishu.cn/open-apis/sheets/v3/spreadsheets/${this.ops.spreadsheetToken}/sheets/query`,
       {
         headers: {
-          Authorization: `Bearer ${this.tenant_access_token}`,
+          Authorization: `Bearer ${await this.getTenantAccessToken()}`,
           'Content-Type': 'application/json',
         },
       },
@@ -165,7 +175,7 @@ export class LarkSheet extends BaseClient<SheetOps> {
       },
       {
         headers: {
-          Authorization: `Bearer ${this.tenant_access_token}`,
+          Authorization: `Bearer ${await this.getTenantAccessToken()}`,
           'Content-Type': 'application/json',
         },
       },
@@ -193,7 +203,7 @@ export class LarkSheet extends BaseClient<SheetOps> {
       },
       {
         headers: {
-          Authorization: `Bearer ${this.tenant_access_token}`,
+          Authorization: `Bearer ${await this.getTenantAccessToken()}`,
           'Content-Type': 'application/json',
         },
       },
@@ -213,7 +223,7 @@ export class LarkSheet extends BaseClient<SheetOps> {
       `https://open.feishu.cn/open-apis/sheets/v2/spreadsheets/${this.ops.spreadsheetToken}/values_get`,
       {
         headers: {
-          Authorization: `Bearer ${this.tenant_access_token}`,
+          Authorization: `Bearer ${await this.getTenantAccessToken()}`,
           'Content-Type': 'application/json',
         },
       },
@@ -239,7 +249,7 @@ export class LarkSheet extends BaseClient<SheetOps> {
       },
       {
         headers: {
-          Authorization: `Bearer ${this.tenant_access_token}`,
+          Authorization: `Bearer ${await this.getTenantAccessToken()}`,
           'Content-Type': 'application/json',
         },
       },
