@@ -1,16 +1,16 @@
 /* eslint-disable sort-keys */
-import { LarkSheet, LarkTable, VikaTable, SheetOps, TableOps, VikaOps } from '../src/mod.js'
+import { LarkSheet, LarkTable, VikaTable, LarkSheetOps, LarkTableOps, VikaOps } from '../src/mod.js'
 
 const main = async () => {
   const latestTime = new Date().toLocaleString('zh-CN', { timeZone: 'Asia/Shanghai' })
-  const bitableOptions: TableOps = {
+  const bitableOptions: LarkTableOps = {
     appId: '',
     appSecret: '',
     appToken: 'CcHNb4wMkapNUYsDMB5cUb6VnI3',
     name: '测试表格',
   }
 
-  const spreadsheetsOptions: SheetOps = {
+  const spreadsheetsOptions: LarkSheetOps = {
     appId: '',
     appSecret: '',
     spreadsheetToken: 'shtcnQX9PFJgxHLBOFivEJ3dqWh',

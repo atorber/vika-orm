@@ -1,7 +1,7 @@
 import { BaseEntity, VikaOptions, MappingOptions, wait } from './vika.js'
 import { v4 as uuidv4 } from 'uuid'
 import { LarkSheet, LarkTable, VikaTable } from './index.js'
-import type { VikaOps, SheetOps, TableOps } from './index.js'
+import type { VikaOps, LarkSheetOps, LarkTableOps } from './index.js'
 
 export {
   BaseEntity,
@@ -16,6 +16,6 @@ export type {
   VikaOptions,
   MappingOptions,
   VikaOps,
-  SheetOps,
-  TableOps,
+  LarkTableOps,
+  LarkSheetOps,
 }

@@ -58,17 +58,17 @@ abstract class BaseClient<Ops extends BaseOps> {
 }
 
 // Sheet 操作接口和类
-export interface SheetOps extends BaseOps {
+export interface LarkSheetOps extends BaseOps {
   spreadsheetToken: string;
   name: string;
 }
 
-export class LarkSheet extends BaseClient<SheetOps> {
+export class LarkSheet extends BaseClient<LarkSheetOps> {
 
   tenant_access_token: string = ''
   tenant_access_token_time: number = 0
 
-  constructor (ops: SheetOps) {
+  constructor (ops: LarkSheetOps) {
     super(ops)
   }
 
@@ -267,14 +267,14 @@ export class LarkSheet extends BaseClient<SheetOps> {
 }
 
 // Table 操作接口和类
-export interface TableOps extends BaseOps {
+export interface LarkTableOps extends BaseOps {
   appToken: string;
   name: string;
 }
 
-export class LarkTable extends BaseClient<TableOps> {
+export class LarkTable extends BaseClient<LarkTableOps> {
 
-  constructor (ops: TableOps) {
+  constructor (ops: LarkTableOps) {
     super(ops)
   }
 
@@ -406,14 +406,63 @@ export class LarkTable extends BaseClient<TableOps> {
   // 查找数据
   async findOne (query: Document): Promise<Document> {
     console.info('query', query)
-    return query
+    const conditions = Object.keys(query).map((key) => {
+      const type: 'is' = 'is'
+      return {
+        field_name: key,
+        operator: type,
+        value: [
+          query[key] as string,
+        ],
+      }
+    })
+    const res = await this.client.bitable.appTableRecord.search({
+      data: {
+        filter: {
+          conjunction: 'and',
+          conditions,
+        },
+      },
+      path: {
+        app_token: this.ops.appToken,
+        table_id: this.tableId,
+      },
+    })
+    const docs:Document[]|undefined = res.data?.items?.map((item) => {
+      return item.fields as Document
+    }) || []
+    return docs[0] || {}
   }
 
   // 查找数据
   async find (query: Document): Promise<Document[]> {
     console.info('query', query)
-
-    return [ query ]
+    const conditions = Object.keys(query).map((key) => {
+      const type: 'is' = 'is'
+      return {
+        field_name: key,
+        operator: type,
+        value: [
+          query[key] as string,
+        ],
+      }
+    })
+    const res = await this.client.bitable.appTableRecord.search({
+      data: {
+        filter: {
+          conjunction: 'and',
+          conditions,
+        },
+      },
+      path: {
+        app_token: this.ops.appToken,
+        table_id: this.tableId,
+      },
+    })
+    const docs:Document[]|undefined = res.data?.items?.map((item) => {
+      return item.fields as Document
+    }) || []
+    return docs
   }
 
   // 删除数据
@@ -560,13 +609,45 @@ export class VikaTable extends BaseClient<VikaOps> {
   // 查找数据
   async findOne (query: Document): Promise<Document> {
     console.info('query', query)
-    return query
+    const filterByFormula = `{_id}="${query['_id'] || ''}"`
+    // 查询示例：&filterByFormula={标题}="标题1"（需要用 encodeURIComponent() 函数对 {标题}="标题1" 进行转义编码），可以精确匹配「标题」这列中值为「标题1」的记录。
+    const res = await axios.get(
+      `https://vika.cn/fusion/v3/datasheets/${this.tableId}/records?filterByFormula=${encodeURIComponent(filterByFormula)}`,
+      {
+        headers: {
+          Authorization: `Bearer ${this.ops.appSecret}`,
+          'Content-Type': 'application/json',
+        },
+      },
+    )
+    const docs:Document[] = res.data.data.records?.map((item:{
+      fields: Document
+    }) => {
+      return item.fields
+    })
+    return docs[0] || {}
   }
 
   // 查找数据
   async find (query: Document): Promise<Document[]> {
     console.info('query', query)
-    return [ query ]
+    const filterByFormula = `{_id}="${query['_id'] || ''}"`
+    // 查询示例：&filterByFormula={标题}="标题1"（需要用 encodeURIComponent() 函数对 {标题}="标题1" 进行转义编码），可以精确匹配「标题」这列中值为「标题1」的记录。
+    const res = await axios.get(
+      `https://vika.cn/fusion/v3/datasheets/${this.tableId}/records?filterByFormula=${encodeURIComponent(filterByFormula)}`,
+      {
+        headers: {
+          Authorization: `Bearer ${this.ops.appSecret}`,
+          'Content-Type': 'application/json',
+        },
+      },
+    )
+    const docs:Document[]|undefined = res.data.data.records?.map((item:{
+      fields: Document
+    }) => {
+      return item.fields
+    })
+    return docs || []
   }
 
   // 删除数据
