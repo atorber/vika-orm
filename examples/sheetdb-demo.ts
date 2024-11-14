@@ -1,45 +1,45 @@
 /* eslint-disable sort-keys */
-import { SheetDB, BiTableOptions, SpreadSheetsOptions } from '../src/mod.js'
+import { LarkSheet, LarkTable, VikaTable, SheetOps, TableOps, VikaOps } from '../src/mod.js'
 
 const main = async () => {
   const latestTime = new Date().toLocaleString('zh-CN', { timeZone: 'Asia/Shanghai' })
-  const bitableOptions: BiTableOptions = {
+  const bitableOptions: TableOps = {
     appId: '',
     appSecret: '',
     appToken: 'CcHNb4wMkapNUYsDMB5cUb6VnI3',
-    tableId: 'tblMSNWU7cBExFlV',
+    name: '测试表格',
   }
 
-  const spreadsheetsOptions: SpreadSheetsOptions = {
+  const spreadsheetsOptions: SheetOps = {
     appId: '',
     appSecret: '',
     spreadsheetToken: 'shtcnQX9PFJgxHLBOFivEJ3dqWh',
-    sheetId:'wGEECy',
+    name:'测试表格',
   }
 
-  const db = new SheetDB(bitableOptions)
-  const res = await db.insert({
+  const vikaOptions: VikaOps = {
+    appId: '',
+    appSecret: '',
+    name: '测试表格',
+  }
+
+  const data = {
     分钟: new Date().getTime(),
     更新时间: latestTime,
     最大购买力: 481437.52,
-  })
+  }
+
+  const db = new LarkTable(bitableOptions)
+  await db.init()
+  const res = await db.insert(data)
   console.info(res)
 
-  const db2 = new SheetDB(spreadsheetsOptions)
-  await db2.setTenantAccessToken()
-  //   [
-  //     latestTime, 481437.52, 363645.00, 31437.52, 15683, '2024/11/11 13:43', '2024-11-11 13', '2024/11/11', '2024/11/11 13:43'
-  // ]
-  const data = {
-    latestTime,
-    481437.52: 481437.52,
-    '363645.00': 363645.00,
-    31437.52: 31437.52,
-    15683: 15683,
-    '2024/11/11 13:43': '2024/11/11 13:43',
-    '2024-11-11 13': '2024-11-11 13',
-    '2024/11/11': '2024/11/11',
-  }
+  const db2 = new LarkSheet(spreadsheetsOptions)
+  await db2.init()
+
+  const db3 = new VikaTable(vikaOptions)
+  await db3.init()
+
   const res2 = await db2.insert(data)
   console.info(res2)
 }
