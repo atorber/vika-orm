@@ -1,6 +1,6 @@
 {
   "name": "vika-orm",
-  "version": "0.4.1",
+  "version": "0.6.0",
   "description": "a sheetdb sdk for vika/lark",
   "type": "module",
   "exports": {
@@ -18,6 +18,7 @@
     "@larksuiteoapi/node-sdk": "^1.38.0",
     "@vikadata/vika": "^1.0.5",
     "axios": "^1.7.7",
+    "nedb-promises": "^6.2.3",
     "uuid": "^9.0.1"
   },
   "peerDependencies": {
@@ -51,7 +52,10 @@
     "test-test": "npm-run-all lint test:unit",
     "test:pack": "bash -x scripts/npm-pack-testing.sh",
     "test:unit": "cross-env NODE_OPTIONS=\"--no-warnings --loader=ts-node/esm\" tap \"src/**/*.spec.ts\" \"tests/**/*.spec.ts\"",
-    "lint:es": "eslint --ignore-pattern tests/fixtures/ '{bin,examples,scripts,src,tests}/**/*.ts'"
+    "lint:es": "eslint --ignore-pattern tests/fixtures/ '{bin,examples,scripts,src,tests}/**/*.ts'",
+    "start-sheetdb": "cross-env NODE_OPTIONS=\"--no-warnings --loader=ts-node/esm\" node examples/sheetdb-demo.ts",
+    "test-sheetdb": "cross-env NODE_OPTIONS=\"--no-warnings --loader=ts-node/esm\" node test/test.ts"
+
   },
   "repository": {
     "type": "git",
@@ -77,10 +81,5 @@
   },
   "publishConfig": {
     "tag": "latest"
-  },
-  "git": {
-    "scripts": {
-      "pre-push": "npx git-scripts-pre-push"
-    }
   }
 }

@@ -107,3 +107,7 @@ t/
 t.*
 package-lock.json
 *.memory-card.json
+src/test.ts
+test.db
+test/test.ts
+tests/test.ts
