@@ -495,12 +495,18 @@ export class VikaTable extends BaseClient<VikaOps> {
 
   // 创建表格（根据 Vika API 文档实现）
   async create (title: string, heading: Document): Promise<Table> {
-    const fields: { name: string; type: 'Text' | 'Number' | 'Checkbox'; }[] = Object.keys(heading).map((key) => {
+    const fields: { name: string; type: 'Text' | 'Number' | 'Checkbox'; property?:{icon:string}}[] = Object.keys(heading).map((key) => {
       const type = typeof heading[key] === 'number' ? 'Number' : (typeof heading[key] === 'boolean' ? 'Checkbox' : 'Text')
-      return {
+      const field:{ name: string; type: 'Text' | 'Number' | 'Checkbox'; property?:{icon:string}} = {
         name: key,
         type,
       }
+      if (type === 'Checkbox') {
+        field['property'] = {
+          icon: 'white_check_mark',
+        }
+      }
+      return field
     })
     fields.unshift({
       name: '_id',
