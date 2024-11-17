@@ -50,7 +50,7 @@ abstract class BaseClient<Ops extends BaseOps> {
   abstract create(name: string, heading: Document): Promise<Table>;
   abstract list(name: string): Promise<Table>;
   abstract insert(doc: Document | Document[]): Promise<Document | Document[]>;
-  abstract update(query: Document, doc: Document): Promise<Document>;
+  abstract update(_id: string, doc: Document): Promise<Document>;
   abstract find(query: Document): Promise<Document[]>;
   abstract findOne(query: Document): Promise<Document>;
   abstract remove(query: Document): Promise<Document>;
@@ -201,8 +201,7 @@ export class LarkSheet extends BaseClient<LarkSheetOps> {
   }
 
   // 更新数据
-  async update (query: Document, doc: Document): Promise<Document> {
-    console.info('query', query)
+  async update (_id: string, doc: Document): Promise<Document> {
     const preparedDoc = this.prepareDocument(doc)
     const dataArr = Object.values(preparedDoc)
     const res = await axios.post(
@@ -294,10 +293,6 @@ export class LarkTable extends BaseClient<LarkTableOps> {
         type,
       }
     })
-    fields.unshift({
-      field_name: '_id',
-      type: 1,
-    })
     const res = await this.client.bitable.appTable.create({
       data: {
         table: {
@@ -388,18 +383,20 @@ export class LarkTable extends BaseClient<LarkTableOps> {
         },
       })
       if (res.msg === 'success' && res.code === 0) {
-        return newDocs[0] || {}
+        const data:Document = res.data?.record?.fields as Document
+        data['_id'] = res.data?.record?.record_id || ''
+        return data
       } else {
         return {
           error: JSON.stringify(res),
+          msg: res.msg || 'error',
         }
       }
     }
   }
 
   // 更新数据
-  async update (query: Document, doc: Document): Promise<Document> {
-    console.info('query', query)
+  async update (_id: string, doc: Document): Promise<Document> {
     return doc
   }
 
@@ -508,10 +505,6 @@ export class VikaTable extends BaseClient<VikaOps> {
       }
       return field
     })
-    fields.unshift({
-      name: '_id',
-      type: 'Text',
-    })
     const body = {
       name: title,
       description: title,
@@ -567,7 +560,12 @@ export class VikaTable extends BaseClient<VikaOps> {
 
     // console.info(JSON.stringify(res.data, null, 2));
     if (res.data.code === 200 && res.data.success) {
-      return newDocs.length > 1 ? newDocs : (newDocs[0] || [])
+      const records = res.data.data.records
+      records.forEach((record: any) => {
+        record.fields['_id'] = record.recordId
+        newDocs.push(record.fields)
+      })
+      return newDocs.length > 1 ? newDocs : (newDocs[0] || {})
     } else {
       return res.data
     }
@@ -606,10 +604,35 @@ export class VikaTable extends BaseClient<VikaOps> {
   }
 
   // 更新数据
-  async update (query: Document, doc: Document): Promise<Document> {
-    console.info('query', query)
+  async update (_id: string, doc: Document): Promise<Document> {
+    console.info('doc', doc)
+    if (doc['_id']) delete doc['_id']
 
-    return doc
+    const data = {
+      records: [
+        {
+          recordId: _id,
+          fields: doc,
+        },
+      ],
+    }
+    const res = await axios.patch(
+        `https://vika.cn/fusion/v1/datasheets/${this.tableId}/records`,
+        data,
+        {
+          headers: {
+            Authorization: `Bearer ${this.ops.appSecret}`,
+            'Content-Type': 'application/json',
+          },
+        },
+    )
+    console.info(JSON.stringify(res, null, 2))
+    if (res.data.code === 200 && res.data.success) {
+      doc['_id'] = _id
+      return doc
+    } else {
+      return res.data
+    }
   }
 
   // 查找数据
@@ -626,7 +649,7 @@ export class VikaTable extends BaseClient<VikaOps> {
         },
       },
     )
-    const docs:Document[] = res.data.data.records?.map((item:{
+    const docs:Document[] = res.data.data.records?.filter((item:any) => Object.keys(item.fields).length > 0).map((item:{
       fields: Document
     }) => {
       return item.fields
@@ -637,7 +660,9 @@ export class VikaTable extends BaseClient<VikaOps> {
   // 查找数据
   async find (query: Document): Promise<Document[]> {
     console.info('query', query)
-    const filterByFormula = `{_id}="${query['_id'] || ''}"`
+    const key = Object.keys(query)[0] || ''
+    const value = query[key] || ''
+    const filterByFormula = `{${key}}="${value}"`
     // 查询示例：&filterByFormula={标题}="标题1"（需要用 encodeURIComponent() 函数对 {标题}="标题1" 进行转义编码），可以精确匹配「标题」这列中值为「标题1」的记录。
     const res = await axios.get(
       `https://vika.cn/fusion/v3/datasheets/${this.tableId}/records?filterByFormula=${encodeURIComponent(filterByFormula)}`,
@@ -648,7 +673,26 @@ export class VikaTable extends BaseClient<VikaOps> {
         },
       },
     )
-    const docs:Document[]|undefined = res.data.data.records?.map((item:{
+    const docs:Document[]|undefined = res.data.data.records?.filter((item:any) => Object.keys(item.fields).length > 0).map((item:{
+      fields: Document
+    }) => {
+      return item.fields
+    })
+    return docs || []
+  }
+
+  // 查找所有数据
+  async findAll (): Promise<Document[]> {
+    const res = await axios.get(
+      `https://vika.cn/fusion/v3/datasheets/${this.tableId}/records`,
+      {
+        headers: {
+          Authorization: `Bearer ${this.ops.appSecret}`,
+          'Content-Type': 'application/json',
+        },
+      },
+    )
+    const docs:Document[]|undefined = res.data.data.records?.filter((item: any) => Object.keys(item.fields).length > 0).map((item:{
       fields: Document
     }) => {
       return item.fields
